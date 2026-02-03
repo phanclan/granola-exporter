@@ -94,11 +94,34 @@ def extract_text_from_prosemirror(node):
         # Default fallthrough for unknown containers
         return inner_text
 
+def format_timestamp(iso_timestamp, reference_timestamp=None):
+    """Format ISO timestamp as relative time from reference or as HH:MM:SS."""
+    try:
+        dt = datetime.datetime.fromisoformat(iso_timestamp.replace('Z', '+00:00'))
+
+        if reference_timestamp:
+            ref_dt = datetime.datetime.fromisoformat(reference_timestamp.replace('Z', '+00:00'))
+            delta = dt - ref_dt
+            total_seconds = int(delta.total_seconds())
+            hours = total_seconds // 3600
+            minutes = (total_seconds % 3600) // 60
+            seconds = total_seconds % 60
+
+            if hours > 0:
+                return f"[{hours}:{minutes:02d}:{seconds:02d}]"
+            else:
+                return f"[{minutes}:{seconds:02d}]"
+        else:
+            return dt.strftime("[%H:%M:%S]")
+    except:
+        return "[??:??]"
+
 def parse_args():
     parser = argparse.ArgumentParser(description="Export Granola meeting notes to Markdown.")
     parser.add_argument("--days", type=int, help="Export notes from the last N days.")
     parser.add_argument("--start-date", type=str, help="Export notes on or after this date (YYYY-MM-DD).")
     parser.add_argument("--folders", action="store_true", help="Organize exports into subfolders based on Granola lists/folders.")
+    parser.add_argument("--timestamps", action="store_true", help="Include timestamps in transcripts (useful for AI analysis).")
     parser.add_argument("--output-dir", type=str, default=DEFAULT_EXPORT_DIR,
                         help=f"Output directory for exported notes (default: {DEFAULT_EXPORT_DIR})")
     return parser.parse_args()
@@ -299,11 +322,26 @@ def main():
                 if transcript_segments:
                     with open(os.path.join(meeting_dir, "transcript.md"), 'w') as f:
                         f.write(f"# Transcript: {title}\n\n")
+
+                        # Get first timestamp as reference for relative times
+                        reference_time = None
+                        if args.timestamps and transcript_segments:
+                            reference_time = transcript_segments[0].get('start_timestamp')
+
                         for segment in transcript_segments:
-                            # Note: start_timestamp and source/speaker info available but not used
-                            # for cleaner transcript formatting
                             text = segment.get('text', '')
-                            f.write(f"{text}\n\n")
+
+                            if args.timestamps:
+                                timestamp_str = format_timestamp(
+                                    segment.get('start_timestamp', ''),
+                                    reference_time
+                                )
+                                # Audio source: system = other participants, microphone = you
+                                source = segment.get('source', 'unknown')
+                                source_label = "Microphone" if source == "microphone" else "System Audio"
+                                f.write(f"{timestamp_str} **{source_label}**: {text}\n\n")
+                            else:
+                                f.write(f"{text}\n\n")
                     files_created += 1
 
                 documents_processed += 1

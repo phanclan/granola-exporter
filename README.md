@@ -11,6 +11,7 @@ Perfect for integrating Granola notes with PKM systems like Obsidian, Notion, or
 - **Folder Support** - Automatically moves exported notes into folders (e.g., "Customer Meetings", "1on1s") matching your Granola setup
 - **Date Filtering** - Perfect for daily automation (e.g., "Export only yesterday's notes")
 - **Auto-Cleanup** - Automatically organizes your export folder, removing duplicates if a file moves into a subfolder
+- **Timestamps (Optional)** - Include relative timestamps and audio source labels in transcripts for AI analysis
 
 ---
 
@@ -68,6 +69,47 @@ Export to a specific location.
 
 ```bash
 ./run_export.sh --output-dir ~/Obsidian/Meetings --folders
+```
+
+### 5. With Timestamps (AI Analysis)
+Include timestamps and audio source labels in transcripts. Useful for feeding to AI tools or referencing specific moments.
+
+```bash
+./run_export.sh --days 1 --folders --timestamps
+```
+
+**Example output:**
+```
+[0:00] **System Audio**: Our numbers are still climbing up...
+[0:10] **System Audio**: But I will share. We do have SKO...
+[2:39] **Microphone**: Thanks for sharing that...
+```
+
+---
+
+## Command-Line Options
+
+All flags can be combined as needed.
+
+| Flag | Description | Example |
+|------|-------------|---------|
+| `--days N` | Export notes from the last N days | `--days 7` |
+| `--start-date YYYY-MM-DD` | Export notes on or after this date | `--start-date 2026-01-01` |
+| `--folders` | Organize exports into subfolders based on Granola lists | `--folders` |
+| `--timestamps` | Include timestamps and audio source in transcripts (for AI) | `--timestamps` |
+| `--output-dir PATH` | Custom output directory (default: sibling `Granola-Export/` folder) | `--output-dir ~/Notes` |
+| `--help` | Show help message with all options | `--help` |
+
+**Examples:**
+```bash
+# Export last week with folder organization
+./run_export.sh --days 7 --folders
+
+# Export to custom location with timestamps
+./run_export.sh --output-dir ~/Obsidian/Meetings --timestamps --folders
+
+# Export everything from January onwards
+./run_export.sh --start-date 2026-01-01 --folders
 ```
 
 ---
