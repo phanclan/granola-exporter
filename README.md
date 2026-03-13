@@ -1,5 +1,19 @@
 # Granola Local Exporter
 
+## ⚠️ Project Status: Broken / Unmaintained
+
+> **This project is currently broken** due to upstream changes in Granola and is **no longer actively maintained**.
+>
+> The exporter relied on Granola's local cache format, which has since changed. Until those changes are addressed, this tool will not function as expected. No known workaround exists at this time.
+>
+> **What you can do:**
+> - Fork this repository and adapt it to Granola's updated behavior.
+> - Watch the repository for any future updates.
+>
+> Support requests and bug reports are unlikely to be addressed. Use this project at your own risk.
+
+---
+
 A powerful tool to export your meeting data from Granola.ai into well-structured Markdown files. This tool accesses your local Granola cache directly, ensuring specific formatted extraction of your Enhanced Notes, Summaries, and Transcripts.
 
 Perfect for integrating Granola notes with PKM systems like Obsidian, Notion, or any markdown-based workflow.
